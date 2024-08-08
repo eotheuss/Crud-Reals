@@ -11,7 +11,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('users.index', compact('users'));
+        return view('users.read', compact('users'));
     }
 
     public function create()
@@ -34,7 +34,7 @@ class UserController extends Controller
         ]);
 
         User::create($request->all());
-        return redirect()->route('users.index');
+        return redirect()->route('users.read');
     }
 
     public function edit(User $user)
@@ -57,13 +57,13 @@ class UserController extends Controller
         ]);
 
         $user->update($request->all());
-        return redirect()->route('users.index');
+        return redirect()->route('users.read');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index');
+        return redirect()->route('users.read');
     }
 
     public function getCidades($estado)
