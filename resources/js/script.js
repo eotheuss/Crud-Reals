@@ -21,28 +21,27 @@ async function carregarEstados() {
 }
 
 async function carregarCidades() {
-    const estadoSelect = document.getElementById('estado');
+    const estado = document.getElementById('estado').value;
     const cidadeSelect = document.getElementById('cidade');
-    const estadoSelecionado = estadoSelect.value;
-
-    // Limpa as cidades anteriores
-    cidadeSelect.innerHTML = '<option value="">Selecione uma cidade</option>';
-
-    if (estadoSelecionado) {
-        try {
-            const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoSelecionado}/municipios`);
-            const cidades = await response.json();
-
-            cidades.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(cidade => {
-                const option = document.createElement('option');
-                option.value = cidade.nome;
-                option.textContent = cidade.nome;
-                cidadeSelect.appendChild(option);
-                document.getElementById('cidade').disabled = ''
-
+    
+    cidadeSelect.disabled = true;
+    cidadeSelect.innerHTML = '<option value="">Carregando...</option>';
+    
+    if (estado) {
+        fetch(`/cidades/${estado}`)
+            .then(response => response.json())
+            .then(cidades => {
+                cidadeSelect.disabled = false;
+                cidadeSelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+                cidades.forEach(cidade => {
+                    const option = document.createElement('option');
+                    option.value = cidade.nome;
+                    option.text = cidade.nome;
+                    cidadeSelect.appendChild(option);
+                });
             });
-        } catch (error) {
-            console.error('Erro ao carregar as cidades:', error);
-        }
+    } else {
+        cidadeSelect.innerHTML = '<option value="">Selecione um estado primeiro</option>';
     }
 }
+

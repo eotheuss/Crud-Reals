@@ -2,16 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\UserController;
+
 Route::get('/', function () {
     return view('welcome');
 });
 
 
-Route::controller(ProductController::class)->group(function(){
-    Route::get('index')->name('index');
-    Route::get('create','create')->name('create');
-    Route::post('store')->name('store');
-    Route::get('edit')->name('edit');
-    Route::put('update')->name('update');
-    Route::delete('destroy')->name('destroy');    
-});
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/cidades/{estado}', [UserController::class, 'getCidades']);

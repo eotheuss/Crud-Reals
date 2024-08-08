@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
@@ -14,7 +16,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')->json();
+        return view('users.create', ['estados' => $estados]);
     }
 
     public function store(Request $request)
@@ -36,7 +39,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')->json();
+        return view('users.edit', compact('user', 'estados'));
     }
 
     public function update(Request $request, User $user)
@@ -60,5 +64,10 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('users.index');
+    }
+
+    public function getCidades($estado)
+    {
+        return Http::get("https://servicodados.ibge.gov.br/api/v1/localidades/estados/{$estado}/municipios")->json();
     }
 }
