@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -16,21 +15,26 @@ class UserController extends Controller
 
     public function create()
     {
-        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')->json();
+        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+            ->failed(function ($response) {
+                abort(500, 'Falha ao carregar estados.');
+            })
+            ->json();
+
         return view('users.create', ['estados' => $estados]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'nome' => 'required',
             'cpf' => 'required|unique:users',
-            'birthdate' => 'required|date',
+            'data-nascimento' => 'required|date',
             'email' => 'required|email|unique:users',
-            'phone' => 'required',
-            'address' => 'required',
-            'city' => 'required',
-            'state' => 'required',
+            'telefone' => 'required',
+            'endereco' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
         ]);
 
         User::create($request->all());
@@ -39,21 +43,26 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')->json();
+        $estados = Http::get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+            ->failed(function ($response) {
+                abort(500, 'Falha ao carregar estados.');
+            })
+            ->json();
+
         return view('users.edit', compact('user', 'estados'));
     }
 
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required',
+            'nome' => 'required',
             'cpf' => 'required|unique:users,cpf,' . $user->id,
-            'birthdate' => 'required|date',
+            'data-nascimento' => 'required|date',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required',
-            'address' => 'required',
-            'city' => 'required',
-            'state' => 'required',
+            'telefone' => 'required',
+            'endereco' => 'required',
+            'cidade' => 'required',
+            'estado' => 'required',
         ]);
 
         $user->update($request->all());
@@ -68,6 +77,12 @@ class UserController extends Controller
 
     public function getCidades($estado)
     {
-        return Http::get("https://servicodados.ibge.gov.br/api/v1/localidades/estados/{$estado}/municipios")->json();
+        $cidades = Http::get("https://servicodados.ibge.gov.br/api/v1/localidades/estados/{$estado}/municipios")
+            ->failed(function ($response) {
+                abort(500, 'Falha ao carregar cidades.');
+            })
+            ->json();
+
+        return $cidades;
     }
 }
